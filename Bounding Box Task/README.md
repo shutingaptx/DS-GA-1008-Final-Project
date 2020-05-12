@@ -34,7 +34,7 @@ $ python3 train.py --model_def config/yolov3-custom.cfg --data_config config/cus
 
 The train process is the same as Phase 1.
 
-To get the directly concatenated images, you can refer to `/YOLOv3/IPM_v1.ipynb`.
+To get the BEV images, you can refer to `/YOLOv3/IPM_v1.ipynb`.
 
 
 
