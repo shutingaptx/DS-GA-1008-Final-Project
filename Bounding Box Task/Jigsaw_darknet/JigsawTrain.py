@@ -9,9 +9,9 @@ import argparse
 from time import time
 from tqdm import tqdm
 
-import tensorflow # needs to call tensorflow before torch, otherwise crush
+#import tensorflow # needs to call tensorflow before torch, otherwise crush
 sys.path.append('Utils')
-from logger import Logger
+#from logger import Logger
 
 import torch
 import torch.nn as nn
@@ -40,11 +40,12 @@ parser.add_argument('--cores', default=0, type=int, help='number of CPU core for
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set, No training')
 parser.add_argument("--checkpoint_interval", type=int, default=1, help="interval between saving model weights")
+parser.add_argument("--checkpoint_path", type=str, default='checkpoints/jigsaw4_epoch_2.pth', help="load saved checkpoint")
 
 
 args = parser.parse_args()
-#args.data_path = /scratch/jl9875/dl/project/DLSP20Dataset/data
-args.gpu = None
+args.data_path = '/scratch/jl9875/dl/project/DLSP20Dataset/data'
+
 def main():
     if args.gpu is not None:
         print(('Using GPU %d'%args.gpu))
@@ -54,12 +55,13 @@ def main():
         print('CPU mode')
     os.makedirs("checkpoints", exist_ok=True)
     print('Process number: %d'%(os.getpid()))
-    
+
     ## DataLoader initialize ILSVRC2012_train_processed
+    print('Start dataloader')
     trainpath = args.data_path
     if os.path.exists(trainpath+'_255x255'):
         trainpath += '_255x255'
-    train_data = JigsawDataset(trainpath,'./jigsaw_train_trial.txt',
+    train_data = JigsawDataset(args.data_path,'./jigsaw_train.txt',
                             classes=args.classes)
     train_loader = torch.utils.data.DataLoader(dataset=train_data,
                                             batch_size=args.batch,
@@ -69,14 +71,14 @@ def main():
     valpath = args.data_path#args.data_path+'/ILSVRC2012_img_val'
     if os.path.exists(valpath+'_255x255'):
         valpath += '_255x255'
-    val_data = JigsawDataset(valpath, './jigsaw_val_trial.txt',
+    val_data = JigsawDataset(args.data_path, './jigsaw_val.txt',
                             classes=args.classes)
     val_loader = torch.utils.data.DataLoader(dataset=val_data,
                                             batch_size=args.batch,
                                             shuffle=True,
                                             num_workers=args.cores)
     N = train_data.N
-    
+    print('Finish data loader')
     iter_per_epoch = train_data.N/args.batch
     print('Images: train %d, validation %d'%(train_data.N,val_data.N))
     
@@ -84,31 +86,25 @@ def main():
     net = Network(args.classes)
     if args.gpu is not None:
         net.cuda()
-    
+    print('Initialize the model')
     ############## Load from checkpoint if exists, otherwise from model ###############
-    """
+
     
-    if os.path.exists(args.checkpoint):
-        files = [f for f in os.listdir(args.checkpoint) if 'pth' in f]
-        if len(files)>0:
-            files.sort()
-            #print files
-            ckp = files[-1]
-            net.load_state_dict(torch.load(args.checkpoint+'/'+ckp))
-            args.iter_start = int(ckp.split(".")[-3].split("_")[-1])
-            print('Starting from: ',ckp)
-        else:
-            if args.model is not None:
-                net.load(args.model)
-    """
+    if os.path.exists(args.checkpoint_path):
+        net.load_state_dict(torch.load(args.checkpoint_path))
+        print("Load a checkpoint ", args.checkpoint_path)
+    else:
+        if args.model is not None:
+            net.load(args.model)
+
     if args.model is not None:
         net.load(args.model)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(net.parameters(),lr=args.lr,momentum=0.9,weight_decay = 5e-4)
     
-    logger = Logger(args.checkpoint+'/train')
-    logger_test = Logger(args.checkpoint+'/test')
+    #logger = Logger(args.checkpoint+'/train')
+    #logger_test = Logger(args.checkpoint+'/test')
     
     ############## TESTING ###############
     #if args.evaluate:
@@ -122,10 +118,12 @@ def main():
     # Train the Model
     #batch_time, net_time = [], []
     steps = args.iter_start
-    for epoch in range(int(args.iter_start/iter_per_epoch),args.epochs):
+    print("======================================================================")
+    for epoch in range(args.epochs):
+        print('Epoch {} begins: '.format(epoch))
         t = time()
-        if epoch%2==0 and epoch>0:
-            test(net,criterion,logger_test,val_loader,steps)
+        if epoch%5==0 and epoch>0:
+            test(net,criterion,val_loader,steps)
         lr = adjust_learning_rate(optimizer, epoch, init_lr=args.lr, step=20, decay=0.1)
         
         for i, (images, labels, original) in enumerate(train_loader):
@@ -180,7 +178,7 @@ def main():
         end = time()
         print('Epoch {}/{} LR = {}, Loss = {}, Accuracy = {}, Time taken = {}'.format(epoch+1, args.epochs, lr, loss, acc, end - t))
         if epoch % args.checkpoint_interval == 0:
-            filename = args.checkpoint+'jigsaw_epoch_{}.pth'.format(epoch)
+            filename = args.checkpoint+'jigsaw7_epoch_{}.pth'.format(epoch)
             net.save(filename)    
             #end = time()
 
@@ -188,7 +186,7 @@ def main():
         #    # break without using CTRL+C
         #    break
 
-def test(net,criterion,logger,val_loader,steps):
+def test(net,criterion,val_loader,steps):
     print('Evaluating network.......')
     accuracy = []
     net.eval()
