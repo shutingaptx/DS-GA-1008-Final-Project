@@ -11,6 +11,7 @@ Refer to `/Unet_BEV` and run
 ```bash
 python train.py -e 15 -b 2
 ```
+To get the BEV images, you can refer to `/Unet_BEV/IPM_v1.ipynb`.
 
 ## Scheme 2: Change Encoders and Pretrained Encoder
 ### Phase 1: Original encoder
