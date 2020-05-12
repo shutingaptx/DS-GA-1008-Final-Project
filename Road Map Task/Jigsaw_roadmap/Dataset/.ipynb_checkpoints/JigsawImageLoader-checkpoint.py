@@ -50,7 +50,7 @@ class JigsawDataset(data.Dataset):
             c = np.array([c[1] - a, c[0] - a, c[1] + a + 1, c[0] + a + 1]).astype(int)
             tile = img.crop(c.tolist())
             tile = self.__augment_tile(tile)
-            # Normalize the patches independently to avoid low level features shortcut
+            # Normalize the patches indipendently to avoid low level features shortcut
             m, s = tile.view(3, -1).mean(dim=1).numpy(), tile.view(3, -1).std(dim=1).numpy()
             s[s == 0] = 1
             norm = transforms.Normalize(mean=m.tolist(), std=s.tolist())
