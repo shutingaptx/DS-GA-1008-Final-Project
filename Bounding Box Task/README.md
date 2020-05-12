@@ -2,17 +2,6 @@ This is the folder for the bounding box task. There are 3 phases.
 
 ### Phase 1: Directly Concatenate Images as Input
 
-#### Custom model
-Run the commands below to create a custom model definition, replacing `<num-classes>` with the number of classes in your dataset.
-
-```
-$ cd config/                                # Navigate to config dir
-$ bash create_custom_model.sh <num-classes> # Will create custom model 'yolov3-custom.cfg'
-```
-
-#### Classes
-Add class names to `data/custom/classes.names`. This file should have one row per class name.
-
 #### Image Folder
 Move the images of your dataset to `data/custom/images/`.
 To get the directly concatenated images, you can refer to `/YOLOv3/image_concat.ipynb`.
