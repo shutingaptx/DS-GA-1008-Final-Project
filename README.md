@@ -7,4 +7,5 @@ Both raw images and concatenated images(direct concatenation and bird-eye view(B
 Self-supervised learning by Jigsaw Puzzle was uti-lized to pretrain the encoder Resnet34 and feature extractor Darknet53.
 
 ## Reference
-* [YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3)
+* [PyTorch-YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3)
+* [PYOLOv3_PyTorch](https://github.com/BobLiu20/YOLOv3_PyTorch)
