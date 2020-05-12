@@ -154,7 +154,7 @@ def BEV(sample):
                     mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
                     out += new_layer * mask
 
-        out_rotate = out.transpose(2,0,1).swapaxes(-2,-1)[...,::-1,:]
+        out_rotate = out.transpose(2,0,1).swapaxes(-2,-1)[...,::-1]
         output[i] = torch.as_tensor(out_rotate.copy())
 
     return output
