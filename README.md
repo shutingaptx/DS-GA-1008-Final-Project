@@ -9,3 +9,5 @@ Self-supervised learning by Jigsaw Puzzle was uti-lized to pretrain the encoder 
 ## Reference
 * [PyTorch-YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3)
 * [PYOLOv3_PyTorch](https://github.com/BobLiu20/YOLOv3_PyTorch)
+* [UNet PyTorch](https://github.com/milesial/Pytorch-UNet)
+* IPM: https://torchgeometry.readthedocs.io/en/latest/warp_perspective.html
